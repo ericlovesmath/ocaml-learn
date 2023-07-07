@@ -14,7 +14,7 @@ let parse file =
 
 let part1 file =
   let max list = List.fold_left list ~init:0 ~f:max in
-  parse file |> max
+  parse file |> max |> string_of_int
 
 let part2 file =
   let rec last_three = function
@@ -26,6 +26,4 @@ let part2 file =
     |> List.sort ~compare:Int.compare
     |> last_three
     |> sum
-
-let print_answer file =
-  printf "1.1: %d\n1.2 %d\n" (part1 file) (part2 file)
+    |> string_of_int

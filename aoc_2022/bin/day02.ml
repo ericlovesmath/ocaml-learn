@@ -1,1 +1,3 @@
-let () = print_int 19
+let part1 file = file
+
+let part2 file = file
