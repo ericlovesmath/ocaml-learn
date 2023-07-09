@@ -7,4 +7,5 @@ let solve part1 part2 id =
 let () =
   solve Day01.part1 Day01.part2 1;
   solve Day02.part1 Day02.part2 2;
-  solve Day03.part1 Day03.part2 3
+  solve Day03.part1 Day03.part2 3;
+  solve Day04.part1 Day04.part2 4
