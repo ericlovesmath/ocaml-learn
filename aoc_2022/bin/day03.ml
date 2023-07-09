@@ -13,19 +13,16 @@ module Freq = struct
   let string_code str =
     let freq = Array.create ~len:52 false in
     String.iter str ~f:(add_char freq);
-    (* Array.iter freq ~f:(fun bool -> printf "%d" (if bool then 1 else 0)); printf "\n"; *)
-    (* String.iter str ~f:(fun char -> printf "%c %d\n" char (char_code char)); *)
     freq
 
   let in_all freqs =
-    let combine e1 e2 = Array.init 52 ~f:(fun i -> e1.(i) && e2.(i)) in
-    let rec zip = function
-      | e1 :: e2 :: tl -> zip ((combine e1 e2) :: tl)
-      | [ e ] -> e
-      | [] -> failwith "Day03.Freq: zip recieved empty list"
+    let combine = function
+      | [ e1; e2; e3 ] -> Array.init 52 ~f:(fun i -> e1.(i) && e2.(i) && e3.(i))
+      | [ e1; e2 ] -> Array.init 52 ~f:(fun i -> e1.(i) && e2.(i))
+      | _ -> failwith "Day03.Freq: combine received invalid length"
     in
-    let rec true_id i arr = if arr.(i) then i + 1 else true_id (i + 1) arr in
-    true_id 0 (zip freqs)
+    let rec true_pos i arr = if arr.(i) then i + 1 else true_pos (i + 1) arr in
+    true_pos 0 (combine freqs)
     (* let all_true = List.fold_left ~init:true ~f:( && ) in
     let ans = ref 0 in
     for i = 1 to 52 do
