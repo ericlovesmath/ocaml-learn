@@ -8,9 +8,9 @@ let parse file =
     List.map ~f:Int.of_string (String.split_lines list)
   in
   In_channel.read_all file
-    |> Str.split (Str.regexp "\n\n")
-    |> List.map ~f:int_list_of_string
-    |> List.map ~f:sum
+  |> Str.split (Str.regexp "\n\n")
+  |> List.map ~f:int_list_of_string
+  |> List.map ~f:sum
 
 let part1 file =
   let max list = List.fold_left list ~init:0 ~f:max in
@@ -23,7 +23,7 @@ let part2 file =
     | _ -> failwith "Less than three elements"
   in
   parse file
-    |> List.sort ~compare:Int.compare
-    |> last_three
-    |> sum
-    |> string_of_int
+  |> List.sort ~compare:Int.compare
+  |> last_three
+  |> sum
+  |> string_of_int
