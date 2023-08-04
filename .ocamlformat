@@ -1,7 +1,7 @@
 version = 0.25.1
 profile = janestreet
 
-break-cases = fit
+break-cases = toplevel
 break-sequences = true
 
 # Forces cases to always be on different lines.
