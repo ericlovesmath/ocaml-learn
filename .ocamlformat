@@ -8,6 +8,7 @@ break-sequences = true
 break-fun-decl = smart
 break-infix = wrap-or-vertical
 break-string-literals = never
+break-collection-expressions=wrap
 cases-exp-indent = 2
 doc-comments = before
 type-decl = compact

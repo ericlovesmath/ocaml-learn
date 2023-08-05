@@ -94,3 +94,93 @@ module Problem06 = struct
     assert (is_palindrome [ 1; 2; 3; 4; 5 ] |> not);
     assert (is_palindrome [ 1; 2 ] |> not)
 end
+
+module Problem07 = struct
+  (** Defines nested list structure *)
+  type 'a node = One of 'a | Many of 'a node list
+
+  (** BAD Flatten a nested list structure *)
+  let rec flatten = function
+    | [] -> []
+    | One e :: rem -> e :: flatten rem
+    | Many e :: rem -> flatten e @ flatten rem
+
+  (** Flatten a nested list structure *)
+  let flatten lst =
+    let rec flatten' aux = function
+      | [] -> aux
+      | One e :: rem -> flatten' (e :: aux) rem
+      | Many es :: rem -> flatten' (flatten' aux es) rem
+    in
+    flatten' [] lst |> List.rev
+
+  let () =
+    assert (
+      flatten [ One "a"; Many [ One "b"; Many [ One "c"; One "d" ]; One "e" ] ]
+      = [ "a"; "b"; "c"; "d"; "e" ])
+end
+
+module Problem08 = struct
+  (** Eliminate consecutive duplicates of list elements *)
+  let compress lst =
+    let rec compress' acc = function
+      | [] -> acc
+      | [ e ] -> e :: acc
+      | e1 :: (e2 :: _ as rem) ->
+        compress' (if e1 = e2 then acc else e1 :: acc) rem
+    in
+    compress' [] lst |> List.rev
+
+  let () =
+    assert (
+      compress
+        [ "a"; "a"; "a"; "a"; "b"; "c"; "c"; "a"; "a"; "d"; "e"; "e"; "e"; "e" ]
+      = [ "a"; "b"; "c"; "a"; "d"; "e" ]);
+    assert (compress [] = []);
+    assert (compress [ "a" ] = [ "a" ]);
+    assert (compress [ "a"; "a" ] = [ "a" ]);
+    assert (compress [ "a"; "b" ] = [ "a"; "b" ])
+end
+
+module Problem09 = struct
+  (** Pack Consecutive Duplicates *)
+  let pack lst =
+    let rec pack' subacc acc = function
+      | [] -> []
+      | [ e ] -> (e :: subacc) :: acc
+      | e1 :: (e2 :: _ as rem) ->
+        let subacc = e1 :: subacc in
+        if e1 = e2 then pack' subacc acc rem else pack' [] (subacc :: acc) rem
+    in
+    pack' [] [] lst |> List.rev
+
+  let () =
+    assert (
+      pack
+        [ "a"; "a"; "a"; "a"; "b"; "c"; "c"; "a"; "a"; "d"; "d"; "e"; "e"; "e"
+        ; "e" ]
+      = [ [ "a"; "a"; "a"; "a" ]; [ "b" ]; [ "c"; "c" ]; [ "a"; "a" ]
+        ; [ "d"; "d" ]; [ "e"; "e"; "e"; "e" ] ]);
+    assert (pack [ "a" ] = [ [ "a" ] ]);
+    assert (pack [] = [])
+end
+
+module Problem10 = struct
+  (** Implement Run-length Encoding *)
+  let encode lst =
+    let rec encode' cnt acc = function
+      | [] -> []
+      | [ e ] -> (cnt + 1, e) :: acc
+      | e1 :: (e2 :: _ as rem) ->
+        if e1 = e2
+        then encode' (cnt + 1) acc rem
+        else encode' 0 ((cnt + 1, e1) :: acc) rem
+    in
+    encode' 0 [] lst |> List.rev
+
+  let () =
+    assert (encode ["a"; "a"; "a"; "a"; "b"; "c"; "c"; "a"; "a"; "d"; "e"; "e"; "e"; "e"] =
+      [(4, "a"); (1, "b"); (2, "c"); (2, "a"); (1, "d"); (4, "e")]);
+    assert (encode [ "a" ] = [ (1, "a") ]);
+    assert (encode [] = [])
+end
