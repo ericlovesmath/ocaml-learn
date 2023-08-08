@@ -179,8 +179,72 @@ module Problem10 = struct
     encode' 0 [] lst |> List.rev
 
   let () =
-    assert (encode ["a"; "a"; "a"; "a"; "b"; "c"; "c"; "a"; "a"; "d"; "e"; "e"; "e"; "e"] =
-      [(4, "a"); (1, "b"); (2, "c"); (2, "a"); (1, "d"); (4, "e")]);
+    assert (
+      encode
+        [ "a"; "a"; "a"; "a"; "b"; "c"; "c"; "a"; "a"; "d"; "e"; "e"; "e"; "e" ]
+      = [ (4, "a"); (1, "b"); (2, "c"); (2, "a"); (1, "d"); (4, "e") ]);
     assert (encode [ "a" ] = [ (1, "a") ]);
     assert (encode [] = [])
+end
+
+module Problem11 = struct
+  (** Duplicate each element of a List *)
+  let duplicate lst =
+    let rec duplicate' acc = function
+      | [] -> acc
+      | e :: rem -> duplicate' (e :: e :: acc) rem
+    in
+    duplicate' [] (List.rev lst)
+
+  let () =
+    assert (
+      duplicate [ "a"; "b"; "c"; "c"; "d" ]
+      = [ "a"; "a"; "b"; "b"; "c"; "c"; "c"; "c"; "d"; "d" ]);
+    assert (duplicate [] = []);
+    assert (duplicate [ 1 ] = [ 1; 1 ])
+end
+
+module Problem12 = struct
+  (** Replicate each element of a List given a number of times *)
+  let replicate lst count =
+    let rec add_n n lst e = if n = 0 then lst else add_n (n - 1) (e :: lst) e in
+    if count < 0
+    then failwith "Problem12.replicate received negative count"
+    else List.fold_left (add_n count) [] (List.rev lst)
+
+  let () =
+    assert (
+      replicate [ "a"; "b"; "c"; "c"; "d" ] 2
+      = [ "a"; "a"; "b"; "b"; "c"; "c"; "c"; "c"; "d"; "d" ]);
+    assert (
+      replicate [ "a"; "b"; "c" ] 3
+      = [ "a"; "a"; "a"; "b"; "b"; "b"; "c"; "c"; "c" ]);
+    assert (replicate [ "a"; "b"; "c" ] 0 = []);
+    assert (replicate [] 5 = []);
+    assert (replicate [ "a" ] 1 = [ "a" ]);
+    assert (fails (fun () -> replicate [ "a"; "b" ] (-1)))
+end
+
+module Problem13 = struct
+  (** Drop every nth element of list *)
+  let drop lst n =
+    let rec drop' acc lst count =
+      match (count, lst) with
+      | _, [] -> acc
+      | 1, _ :: rem -> drop' acc rem n
+      | count, e :: rem -> drop' (e :: acc) rem (count - 1)
+    in
+    if n <= 0
+    then failwith "Problem13.drop received non-positive n"
+    else List.rev (drop' [] lst n)
+
+  let () =
+    assert (
+      drop [ "a"; "b"; "c"; "d"; "e"; "f"; "g"; "h"; "i"; "j" ] 3
+      = [ "a"; "b"; "d"; "e"; "g"; "h"; "j" ]);
+    assert (drop [ "a"; "b"; "c" ] 3 = [ "a"; "b" ]);
+    assert (drop [ "a"; "b"; "c" ] 1 = []);
+    assert (drop [] 5 = []);
+    assert (fails (fun () -> drop [ "a"; "b" ] 0));
+    assert (fails (fun () -> drop [ "a"; "b" ] (-1)))
 end
