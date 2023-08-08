@@ -358,3 +358,80 @@ module Problem17 = struct
     assert (remove_at 0 [ "a" ] = []);
     assert (fails (fun () -> remove_at 0 []))
 end
+
+module Problem18 = struct
+  (** Insert element [e] at index [k]. If [k > List.length], insert at the end.
+      If [k < 0], insert at beginning. *)
+  let insert_at e k lst =
+    let split k lst =
+      let rec split' acc k lst =
+        match (k, lst) with
+        | _, [] -> (acc, lst)
+        | k, _ when k <= 0 -> (acc, lst)
+        | k, e :: rem -> split' (e :: acc) (k - 1) rem
+      in
+      split' [] k lst
+    in
+    let rec return lst = function
+      | [] -> lst
+      | e :: rem -> return (e :: lst) rem
+    in
+    let left, right = split k lst in
+    return (e :: right) left
+
+  let () =
+    assert (insert_at "x" 0 [ "a"; "b"; "c"; "d" ] = [ "x"; "a"; "b"; "c"; "d" ]);
+    assert (insert_at "x" 1 [ "a"; "b"; "c"; "d" ] = [ "a"; "x"; "b"; "c"; "d" ]);
+    assert (insert_at "x" 2 [ "a"; "b"; "c"; "d" ] = [ "a"; "b"; "x"; "c"; "d" ]);
+    assert (insert_at "x" 3 [ "a"; "b"; "c"; "d" ] = [ "a"; "b"; "c"; "x"; "d" ]);
+    assert (insert_at "x" 4 [ "a"; "b"; "c"; "d" ] = [ "a"; "b"; "c"; "d"; "x" ]);
+    assert (insert_at "x" 5 [ "a"; "b"; "c"; "d" ] = [ "a"; "b"; "c"; "d"; "x" ]);
+    assert (insert_at "x" 10 [ "a"; "b"; "c" ] = [ "a"; "b"; "c"; "x" ]);
+    assert (insert_at "x" (-1) [ "a"; "b"; "c" ] = [ "x"; "a"; "b"; "c" ]);
+    assert (insert_at "a" 0 [] = [ "a" ])
+end
+
+module Problem19 = struct
+  (** Create a List Containing All Integers Within a Given Range, Inclusive *)
+
+  let range l r =
+    let rec range' acc curr =
+      if curr >= l then range' (curr :: acc) (curr - 1) else acc
+    in
+    range' [] r
+
+  let () =
+    assert (range 4 9 = [ 4; 5; 6; 7; 8; 9 ]);
+    assert (range 0 2 = [ 0; 1; 2 ]);
+    assert (range (-2) 2 = [ -2; -1; 0; 1; 2 ]);
+    assert (range 2 2 = [ 2 ]);
+    assert (range 5 2 = [])
+end
+
+module Problem20 = struct
+  (** Get [n] distinct random elements of list using [Random.int] *)
+  let rand_select lst count =
+    let rec get_i acc i lst =
+      match (i, lst) with
+      | _, [] -> failwith "Problem20.rand_select: Unreachable"
+      | 0, e :: rem -> (e, acc @ rem)
+      | i, e :: rem -> get_i (e :: acc) (i - 1) rem
+    in
+    let rec rand_select' acc lst len = function
+      | 0 -> acc
+      | count ->
+        let e, rem = get_i [] (Random.int len) lst in
+        rand_select' (e :: acc) rem (len - 1) (count - 1)
+    in
+    let len = List.length lst in
+    if count > len
+    then failwith "Problem20.rand_select: Count > Length of List"
+    else rand_select' [] lst (List.length lst) count
+
+  let () =
+    Random.init 5;
+    assert (
+      rand_select [ "a"; "b"; "c"; "d"; "e"; "f"; "g"; "h" ] 3
+      = [ "c"; "f"; "h" ]);
+    assert (fails (fun () -> rand_select [ "a"; "b"; "c" ] 6))
+end
