@@ -435,3 +435,56 @@ module Problem20 = struct
       = [ "c"; "f"; "h" ]);
     assert (fails (fun () -> rand_select [ "a"; "b"; "c" ] 6))
 end
+
+module Problem21 = struct
+  (** Lotto: Draw [n] Different Random Numbers From the Set 1..[m] as a list *)
+  let lotto_select n m = Problem20.rand_select (Problem19.range 1 m) n
+
+  let () =
+    Random.init 5;
+    assert (lotto_select 6 49 = [ 35; 41; 32; 17; 2; 6 ]);
+    assert (lotto_select 0 49 = []);
+    assert (fails (fun () -> lotto_select 5 3));
+    assert (fails (fun () -> lotto_select 1 0))
+end
+
+module Problem22 = struct
+  (** Generate a Random Permutation of the Elements of a List *)
+  let permutation lst = Problem20.rand_select lst (List.length lst)
+
+  let () =
+    Random.init 14;
+    assert (
+      permutation [ "a"; "b"; "c"; "d"; "e"; "f" ]
+      = [ "d"; "c"; "e"; "f"; "b"; "a" ]);
+    assert (permutation [] = []);
+    assert (permutation [ "a" ] = [ "a" ])
+end
+
+module Problem23 = struct
+  (** Generate the Combinations of [k] Distinct Objects Chosen From a List *)
+  let extract k lst =
+    let combos = ref [] in
+    let rec extract' k combo rem =
+      match (k, rem) with
+      | 0, _ -> combos := combo :: !combos
+      | k, _ -> extract_iter k combo rem
+    and extract_iter k combo = function
+      | [] -> ()
+      | e :: rem ->
+        extract' (k - 1) (e :: combo) rem;
+        extract_iter k combo rem
+    in
+    extract' k [] (List.rev lst);
+    !combos
+
+  let () =
+    assert (
+      extract 2 [ "a"; "b"; "c"; "d" ]
+      = [ [ "a"; "b" ]; [ "a"; "c" ]; [ "b"; "c" ]; [ "a"; "d" ]; [ "b"; "d" ]
+        ; [ "c"; "d" ] ]);
+    assert (extract 3 [ 1; 2; 3 ] = [ [ 1; 2; 3 ] ]);
+    assert (extract 2 [ 1; 2; 3 ] = [ [ 1; 2 ]; [ 1; 3 ]; [ 2; 3 ] ]);
+    assert (extract 1 [ 1; 2; 3 ] = [ [ 1 ]; [ 2 ]; [ 3 ] ]);
+    assert (extract 0 [ 1; 2; 3 ] = [ [] ])
+end
