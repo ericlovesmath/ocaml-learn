@@ -488,3 +488,80 @@ module Problem23 = struct
     assert (extract 1 [ 1; 2; 3 ] = [ [ 1 ]; [ 2 ]; [ 3 ] ]);
     assert (extract 0 [ 1; 2; 3 ] = [ [] ])
 end
+
+(** TODO: PROBLEMS 24 TO 25 *)
+
+module Problem26 = struct
+  (** Determine Whether a Given Integer Number Is Prime *)
+  let is_prime n =
+    if n = 1
+    then false
+    else (
+      let sq_n = n |> Float.of_int |> Float.sqrt |> Int.of_float in
+      let nums = Problem19.range 2 sq_n in
+      List.fold_left (fun b num -> b && n mod num <> 0) true nums)
+
+  (** Recursive Solution *)
+  let is_prime n =
+    let rec is_prime' curr =
+      curr * curr > n || (n mod curr <> 0 && is_prime' (curr + 1))
+    in
+    n <> 1 && is_prime' 2
+
+  let () =
+    assert (is_prime 1 |> not);
+    assert (is_prime 2);
+    assert (is_prime 3);
+    assert (is_prime 4 |> not);
+    assert (is_prime 7);
+    assert (is_prime 9 |> not);
+    assert (is_prime 12 |> not);
+    assert (is_prime 2381);
+    assert (is_prime 126911 |> not);
+    assert (is_prime 42043)
+end
+
+module Problem27 = struct
+  (** Determine the greatest common divisor of two positive integer numbers. *)
+  let gcd a b =
+    let rec gcd' a b = if b = 0 then a else gcd' b (a mod b) in
+    let a, b = if a > b then (a, b) else (b, a) in
+    gcd' a b
+
+  let () =
+    assert (gcd 13 27 = 1);
+    assert (gcd 20536 7826 = 2);
+    assert (gcd 27 13 = 1);
+    assert (gcd 7826 20536 = 2)
+end
+
+module Problem28 = struct
+  (** Determine whether two positive integer numbers are coprime. *)
+  let coprime a b = Problem27.gcd a b = 1
+
+  let () =
+    assert (coprime 13 27);
+    assert (coprime 20536 7826 |> not)
+end
+
+module Problem29 = struct
+  (** Calculate Euler's Totient Function *)
+  let phi n =
+    let int_of_coprime i = if Problem28.coprime n i then 1 else 0 in
+    List.fold_left ( + ) 0 (List.init n int_of_coprime)
+
+  (** Recursive solution *)
+  let phi n =
+    let rec phi' acc = function
+      | 0 -> acc
+      | i -> phi' (acc + if Problem28.coprime n i then 1 else 0) (i - 1)
+    in
+    phi' 0 n
+
+  let () =
+    assert (phi 10 = 4);
+    assert (phi 2023 = 1632);
+    assert (phi 2 = 1);
+    assert (phi 1 = 1);
+    assert (phi 0 = 0)
+end
