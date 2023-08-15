@@ -27,3 +27,24 @@ let sum_cube_odd n =
   |> List.fold_left ( + ) 0
 
 let sum = List.fold_left ( + ) 0
+
+(* Section 7 *)
+
+type student_info = {
+    mutable name: string;
+    mutable gpa: float;
+}
+
+let my_student = { name = "Alice"; gpa = 3.7 }
+
+let ( +:= ) x y = x := !x + y
+
+(* let x = ref 0;; *)
+(* x +:= 3110;; *)
+(* !x;; *)
+
+let norm vec = Float.sqrt @@ Array.fold_left (fun l r -> l +. r *. r) 0.0 vec
+
+let normalize vec =
+    let len = norm vec in
+    Array.iteri (fun i e -> vec.(i) <- e /. len) vec
