@@ -508,6 +508,17 @@ module Problem26 = struct
     in
     n <> 1 && is_prime' 2
 
+  (** Functional Solution *)
+  let primes_to n =
+    let rec sieve primes = function
+      | [] -> List.rev primes
+      | num :: rem ->
+        sieve (num :: primes) (List.filter (fun i -> i mod num <> 0) rem)
+    in
+    sieve [] (Problem19.range 2 n)
+  (* let primes = primes_to 43000
+  let is_prime n = List.exists (fun e -> e = n) primes *)
+
   let () =
     assert (is_prime 1 |> not);
     assert (is_prime 2);
@@ -564,4 +575,127 @@ module Problem29 = struct
     assert (phi 2 = 1);
     assert (phi 1 = 1);
     assert (phi 0 = 0)
+end
+
+module Problem30 = struct
+  (** Construct a flat list containing the prime factors in ascending order. *)
+  let factors n =
+    let rec factors' acc primes n =
+      match (primes, n) with
+      | _, 1 | [], _ -> List.rev acc
+      | prime :: _, n when n mod prime = 0 ->
+        factors' (prime :: acc) primes (n / prime)
+      | _ :: primes, n -> factors' acc primes n
+    in
+    factors' [] (Problem26.primes_to n) n
+
+  let () =
+    assert (factors 10 = [ 2; 5 ]);
+    assert (factors 2 = [ 2 ]);
+    assert (factors 9 = [ 3; 3 ]);
+    assert (factors 315 = [ 3; 3; 5; 7 ]);
+    assert (factors 1 = []);
+    assert (factors 0 = [])
+end
+
+module Problem31 = struct
+  (** Construct a list containing the prime factors and their multiplicity. *)
+  let factors n =
+    let rec pack curr_e curr_i acc = function
+      | [] -> (curr_e, curr_i) :: acc
+      | e :: rem when e = curr_e -> pack curr_e (curr_i + 1) acc rem
+      | e :: rem -> pack e 1 ((curr_e, curr_i) :: acc) rem
+    in
+    pack 0 0 [] (Problem30.factors n)
+    |> List.rev
+    |> List.tl (* Remove (0, 0) at end, as 0 is never a factor *)
+
+  let () =
+    assert (factors 10 = [ (2, 1); (5, 1) ]);
+    assert (factors 2 = [ (2, 1) ]);
+    assert (factors 9 = [ (3, 2) ]);
+    assert (factors 315 = [ (3, 2); (5, 1); (7, 1) ]);
+    assert (factors 1 = []);
+    assert (factors 0 = [])
+end
+
+module Problem32 = struct
+  (** Calculate Euler's Totient Function, Better *)
+  let exp a b =
+    let rec exp' acc a = function
+      | 0 -> acc
+      | b -> exp' (acc * a) a (b - 1)
+    in
+    exp' 1 a b
+
+  let phi n =
+    Problem31.factors n
+    |> List.fold_left (fun acc (p, m) -> acc * (p - 1) * exp p (m - 1)) 1
+
+  let () =
+    assert (phi 10 = 4);
+    assert (phi 2023 = 1632);
+    assert (phi 2 = 1);
+    assert (phi 1 = 1)
+end
+
+module Problem33 = struct
+  (** View difference in execution speed *)
+  let timeit f x =
+    let t = Sys.time () in
+    let _ = f x in
+    Printf.printf "- Execution time: %fs\n" (Sys.time () -. t)
+
+  (* let () =
+    print_string "Problem 33, Testing Totient\n";
+    timeit Problem29.phi 10090;
+    timeit Problem32.phi 10090 *)
+end
+
+module Problem34 = struct
+  (** Given a range of integers by its lower and upper limit, construct a list
+      of all prime numbers in that range. *)
+  let all_primes left right =
+    let rec sieve primes = function
+      | [] -> List.rev primes
+      | num :: rem ->
+        sieve (num :: primes) (List.filter (fun i -> i mod num <> 0) rem)
+    in
+    sieve [] (Problem19.range left right)
+
+  let () = assert (List.length (all_primes 2 7920) = 1000)
+end
+
+module Problem35 = struct
+  (** Goldbach Conjecture: Write a function to find the two prime numbers that
+      sum up to a given even integer. *)
+  let goldbach n =
+    let rec goldbach' = function
+      | [] -> failwith "Goldbach Conjecture Counterexample Found"
+      | prime :: primes ->
+        if Problem26.is_prime (n - prime)
+        then (prime, n - prime)
+        else goldbach' primes
+    in
+    goldbach' (Problem34.all_primes 3 (n / 2))
+
+  let () =
+    assert (goldbach 8 = (3, 5));
+    assert (goldbach 6 = (3, 3));
+    assert (goldbach 28 = (5, 23));
+    assert (goldbach 122 = (13, 109))
+end
+
+module Problem36 = struct
+  (** Make a list of all Goldbach results *)
+  let goldbach_list l r =
+    Problem19.range l r
+    |> List.filter (fun e -> e mod 2 = 0)
+    |> List.map (fun e -> (e, Problem35.goldbach e))
+
+  let () =
+    assert (
+      goldbach_list 9 20
+      = [ (10, (3, 7)); (12, (5, 7)); (14, (3, 11)); (16, (3, 13)); (18, (5, 13))
+        ; (20, (3, 17)) ])
 end
