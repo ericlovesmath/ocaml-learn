@@ -699,3 +699,68 @@ module Problem36 = struct
       = [ (10, (3, 7)); (12, (5, 7)); (14, (3, 11)); (16, (3, 13)); (18, (5, 13))
         ; (20, (3, 17)) ])
 end
+
+module Problem37And38 = struct
+  type bool_expr =
+    | Var of string
+    | Not of bool_expr
+    | And of bool_expr * bool_expr
+    | Or of bool_expr * bool_expr
+
+  let rec eval_expr vars = function
+    | Var v -> snd (List.find (fun (var, bool) -> var = v) vars)
+    | Not expr -> not (eval_expr vars expr)
+    | And (expr_l, expr_r) -> eval_expr vars expr_l && eval_expr vars expr_r
+    | Or (expr_l, expr_r) -> eval_expr vars expr_l || eval_expr vars expr_r
+
+  (** Given a boolean expression of 2 vars, create a truth table *)
+  let table2 a b expr =
+    [ (true, true, eval_expr [ (a, true); (b, true) ] expr)
+    ; (true, false, eval_expr [ (a, true); (b, false) ] expr)
+    ; (false, true, eval_expr [ (a, false); (b, true) ] expr)
+    ; (false, false, eval_expr [ (a, false); (b, false) ] expr) ]
+
+  (** Given a boolean expression of n vars, create a truth table *)
+  let table vars expr =
+    let get_bool_combos len =
+      let rec get_bool_combos' acc = function
+        | 0 -> acc
+        | curr ->
+          let add_bools acc e = (true :: e) :: (false :: e) :: acc in
+          get_bool_combos' (List.fold_left add_bools [] acc) (curr - 1)
+      in
+      get_bool_combos' [ [] ] len
+    in
+    get_bool_combos (List.length vars)
+    |> List.map (List.combine vars)
+    |> List.map (fun var -> (var, eval_expr var expr))
+
+  let () =
+    assert (
+      table2 "a" "b" (And (Var "a", Or (Var "a", Var "b")))
+      = [ (true, true, true); (true, false, true); (false, true, false)
+        ; (false, false, false) ]);
+    assert (
+      table [ "a"; "b" ] (And (Var "a", Or (Var "a", Var "b")))
+      = [ ([ ("a", true); ("b", false) ], true)
+        ; ([ ("a", false); ("b", false) ], false)
+        ; ([ ("a", true); ("b", true) ], true)
+        ; ([ ("a", false); ("b", true) ], false) ])
+end
+
+module Problem39 = struct
+  let gray len =
+    let rec gray' acc = function
+      | 0 -> acc
+      | curr ->
+        let fst = List.map (fun e -> "0" ^ e) acc in
+        let snd = List.map (fun e -> "1" ^ e) acc in
+        gray' (fst @ List.rev snd) (curr - 1)
+    in
+    gray' [ "" ] len
+
+  let () =
+    assert (gray 1 = [ "0"; "1" ]);
+    assert (gray 2 = [ "00"; "01"; "11"; "10" ]);
+    assert (gray 3 = [ "000"; "001"; "011"; "010"; "110"; "111"; "101"; "100" ])
+end
