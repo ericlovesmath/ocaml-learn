@@ -1,0 +1,21 @@
+version = 0.25.1
+profile = janestreet
+
+break-cases = toplevel
+break-sequences = true
+
+# Forces cases to always be on different lines.
+break-fun-decl = smart
+break-infix = wrap-or-vertical
+break-string-literals = never
+break-collection-expressions=wrap
+cases-exp-indent = 2
+doc-comments = before
+type-decl = compact
+margin = 80
+line-endings = lf
+parse-docstrings = true
+parens-tuple = always
+
+sequence-blank-line = preserve-one
+let-binding-spacing = compact

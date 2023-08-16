@@ -1,0 +1,25 @@
+(lang dune 3.9)
+
+(name data_structures)
+
+(generate_opam_files true)
+
+(source
+ (github ericlovesmath/ocaml-learn))
+
+(authors "Eric Lee")
+
+(maintainers "Eric Lee")
+
+(license LICENSE)
+
+(documentation https://url/to/documentation)
+
+(package
+ (name data_structures)
+ (synopsis "Data Strucutres in OCaml")
+ (description "Data Strucutres in OCaml")
+ (depends ocaml dune))
+
+(wrapped_executables false)
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
