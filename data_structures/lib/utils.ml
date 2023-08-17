@@ -1,4 +1,7 @@
-let test msg cond =
-  assert (
-    if not cond then print_endline ("Test: " ^ msg);
-    cond)
+let test msg cond = if not cond then failwith msg
+
+let test_throws msg ex f =
+  match f () with
+  | exception e when e == ex -> ()
+  | exception e -> failwith (msg ^ ", Unexpected Error" ^ Printexc.to_string e)
+  | _ -> failwith msg
