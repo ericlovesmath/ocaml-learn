@@ -1,2 +1,3 @@
-(test
- (name stack_tests))
+(tests
+ (names stack_test)
+ (libraries lib))
